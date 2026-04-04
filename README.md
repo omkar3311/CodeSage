@@ -104,38 +104,44 @@ http://127.0.0.1:8000
 - Sidebar file explorer
 - Chat history
 
-📌 Example Usage
+## 📌 Example Usage
 
-Upload files:
+### Upload Files
 
+Upload your project files:
+
+```bash
 main.py
 services.py
 auth.py
+```
 
 Ask:
-
+```bash
 How login flow works?
-
-CodeSage will:
+```
+#### CodeSage will:
 
 Find relevant functions
 Show code snippets
 Generate explanation
-🔒 .gitignore
 
-Project ignores:
+---
 
-.env
-__pycache__
-chroma_db
-upload
-virtual environments
-🚀 Future Improvements
-Folder upload
-Code highlighting
-Websocket streaming
-Multi-project support
-Code navigation
+## 🚀 Future Improvements
+
+- 📁 Folder upload support  
+- 🎨 Syntax highlighting for code snippets  
+- ⚡ Real-time streaming using WebSockets  
+- 🧠 Multi-project support  
+- 🔎 Code navigation and function references  
+- 📌 Clickable file and function links  
+- 📄 Support for more programming languages  
+- 💾 Persistent chat history  
+- 🔐 Authentication and user sessions  
+- 📊 Better code search ranking and relevance  
+
+---
 
 ## 👨‍💻 **Author**
 
