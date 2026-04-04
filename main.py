@@ -17,14 +17,11 @@ load_dotenv()
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-UPLOAD_FOLDER = "upload"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 model = SentenceTransformer("BAAI/bge-small-en")
 
 client = chromadb.Client(
     Settings(
-        persist_directory="./chroma_db",
+        persist_directory="/data/chroma_db",
         anonymized_telemetry=False
     )
 )
