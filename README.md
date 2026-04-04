@@ -93,7 +93,7 @@ http://127.0.0.1:8000
 - ChromaDB
 - Sentence Transformers
 - Tree-sitter
-- Jinja2![alt text](CodeSage.png)
+- Jinja2
 - HTML / CSS / JS
 
 
