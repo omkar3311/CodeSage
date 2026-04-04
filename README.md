@@ -43,7 +43,7 @@ Upload your code files and ask questions — CodeSage will search relevant code 
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/codesage.git
+git clone https://github.com/omkar3311/CodeSage.git
 cd codesage
 ```
 
