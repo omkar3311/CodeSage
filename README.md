@@ -122,10 +122,9 @@ How login flow works?
 ```
 #### CodeSage will:
 
-Find relevant functions
-Show code snippets
-Generate explanation
-
+- 🔍 Find relevant functions  
+- 📄 Show code snippets  
+- 🤖 Generate explanation  
 ---
 
 ## 🚀 Future Improvements
