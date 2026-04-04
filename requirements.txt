@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+
+sentence-transformers
+chromadb
+tree-sitter-languages
+
+groq
+python-dotenv
+
+numpy
+torch
+transformers

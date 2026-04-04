@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CodeSage</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: Arial, Helvetica, sans-serif;
+}
+
+.app{
+display:flex;
+height:100vh;
+}
+
+/* Sidebar */
+
+.sidebar{
+width:260px;
+background:#111827;
+color:white;
+padding:15px;
+overflow-y:auto;
+}
+
+.sidebar h3{
+margin-bottom:20px;
+}
+
+.files{
+margin-top:20px;
+}
+
+.file-item{
+background:#1f2937;
+padding:8px;
+margin-bottom:8px;
+border-radius:6px;
+font-size:13px;
+cursor:pointer;
+}
+
+.file-item:hover{
+background:#374151;
+}
+
+/* Main */
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+background:#f9fafb;
+}
+
+header{
+padding:15px;
+border-bottom:1px solid #ddd;
+background:white;
+}
+
+/* Chat */
+
+.chat-container{
+flex:1;
+padding:20px;
+overflow-y:auto;
+}
+
+.message{
+max-width:70%;
+padding:12px;
+margin-bottom:15px;
+border-radius:10px;
+line-height:1.4;
+white-space:pre-wrap;
+}
+
+.user{
+background:#2563eb;
+color:white;
+margin-left:auto;
+}
+
+.bot{
+background:white;
+border:1px solid #e5e7eb;
+}
+
+/* Code block */
+
+pre{
+background:#111827;
+color:#e5e7eb;
+padding:12px;
+border-radius:8px;
+overflow:auto;
+margin-top:8px;
+font-size:13px;
+line-height:1.5;
+}
+
+/* Input */
+
+.input-container{
+display:flex;
+padding:15px;
+gap:10px;
+border-top:1px solid #ddd;
+background:white;
+align-items:center;
+}
+
+textarea{
+flex:1;
+resize:none;
+padding:12px;
+border-radius:8px;
+border:1px solid #ddd;
+height:45px;
+font-size:14px;
+}
+
+textarea:focus{
+outline:none;
+border-color:#2563eb;
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+cursor:pointer;
+font-weight:500;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+.upload-btn{
+background:#e5e7eb;
+padding:10px 14px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.upload-btn:hover{
+background:#d1d5db;
+}
+
+
+.balls::after{
+content:"...";
+animation: blink 1s infinite;
+color:#2563eb;
+margin-left:4px;
+font-weight:bold;
+}
+
+@keyframes blink{
+0%{opacity:0}
+50%{opacity:1}
+100%{opacity:0}
+}
+
+
+.stream-text{
+white-space:pre-wrap;
+}
+.welcome{
+text-align:center;
+color:#6b7280;
+margin-top:120px;
+font-size:28px;
+font-weight:500;
+}
+
+.welcome small{
+display:block;
+margin-top:8px;
+font-size:18px;
+color:#9ca3af;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+
+<div class="sidebar">
+
+<h3>CodeSage</h3>
+
+<div class="files" id="files">
+
+<h4>Files</h4>
+
+{% if files %}
+{% for file in files %}
+
+<div class="file-item">
+<a href="/uploads/{{file}}" target="_blank" style="color:white;text-decoration:none;">
+{{file}}
+</a>
+</div>
+
+{% endfor %}
+{% else %}
+<div class="file-item">No files</div>
+{% endif %}
+
+</div>
+
+</div>
+
+
+<div class="main">
+
+<header>
+<h2>CodeSage</h2>
+</header>
+
+
+<div class="chat-container" id="chat">
+
+<div id="welcome" class="welcome">
+What you like to decode from your codebase?
+<small>Upload files and start asking questions</small>
+</div>  
+
+{% if history %}
+{% for msg in history %}
+
+<div class="message user">
+{{msg.question}}
+</div>
+
+<div class="message bot">
+{{msg.answer | safe}}
+</div>
+
+{% endfor %}
+{% endif %}
+
+</div>
+
+
+<input 
+type="file" 
+id="fileUpload" 
+multiple 
+hidden
+>
+
+<form class="input-container" id="chatForm">
+
+<label 
+class="upload-btn" 
+onclick="document.getElementById('fileUpload').click()"
+>
++
+</label>
+
+<textarea 
+name="question"
+placeholder="Ask anything..."
+required
+></textarea>
+
+<button type="submit">
+Send
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+const chat = document.getElementById("chat");
+const form = document.getElementById("chatForm");
+const textarea = document.querySelector("textarea");
+const fileUpload = document.getElementById("fileUpload");
+
+
+function scrollBottom(){
+setTimeout(()=>{
+chat.scrollTop = chat.scrollHeight;
+},50);
+}
+
+form.addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const question = textarea.value.trim();
+if(!question) return;
+
+const fileRequired = document.getElementById("fileUpload");
+const files = document.querySelectorAll(".file-item");
+
+if(files.length === 0 || files[0].innerText.trim() === "No files"){
+textarea.setCustomValidity("Please upload document first");
+textarea.reportValidity();
+return;
+}else{
+textarea.setCustomValidity("");
+}
+
+if(question && files.length !== 0){
+    const welcome = document.getElementById("welcome");
+    if(welcome) welcome.remove();   
+}
+
+const userDiv = document.createElement("div");
+userDiv.className = "message user";
+userDiv.innerText = question;
+
+chat.appendChild(userDiv);
+
+textarea.value = "";
+
+
+
+const botDiv = document.createElement("div");
+botDiv.className = "message bot";
+
+botDiv.innerHTML = `
+<div class="stream-text"></div>
+`;
+
+chat.appendChild(botDiv);
+
+scrollBottom();
+
+const streamText = botDiv.querySelector(".stream-text");
+
+
+
+const formData = new FormData();
+formData.append("question", question);
+
+const response = await fetch("/chat",{
+method:"POST",
+body:formData
+});
+
+const data = await response.json();
+
+
+
+let fullText = "";
+
+if(data.snippets){
+
+fullText += "<h3>Code Snippets</h3>";
+
+data.snippets.forEach(snippet=>{
+fullText += "```bash\n" + snippet + "\n```\n\n";
+});
+
+}
+
+if(data.explanation){
+
+fullText += "<h3>Explanation</h3>";
+fullText += data.explanation;
+
+}
+
+
+
+let i = 0;
+
+function stream(){
+
+if(i < fullText.length){
+
+let current = fullText.substring(0, i);
+
+streamText.innerHTML = formatText(current) + `<span class="balls"></span>`;
+
+i++;
+
+scrollBottom();
+
+setTimeout(stream , 8);
+
+}else{
+
+streamText.innerHTML = formatText(fullText);
+
+}
+
+}
+
+stream();
+
+});
+
+
+
+function formatText(text){
+
+text = text.replace(
+/```bash([\s\S]*?)```/g,
+'<pre>$1</pre>'
+);
+
+return text.replace(/\n/g , "<br>");
+
+}
+
+
+fileUpload.addEventListener("change", async function(){
+
+const formData = new FormData();
+
+for(let file of fileUpload.files){
+formData.append("files", file);
+}
+
+const response = await fetch("/upload",{
+method:"POST",
+body:formData
+});
+
+const data = await response.json();
+
+updateFiles(data.files);
+textarea.setCustomValidity("");
+
+});
+
+
+
+function updateFiles(files){
+
+const container = document.getElementById("files");
+
+let html = "<h4>Files</h4>";
+
+files.forEach(file => {
+
+html += `
+<div class="file-item">
+<a href="/uploads/${file}" target="_blank" style="color:white;text-decoration:none;">
+${file}
+</a>
+</div>
+`;
+
+});
+
+container.innerHTML = html;
+
+}
+
+scrollBottom();
+
+</script>
+
+</body>
+</html>
