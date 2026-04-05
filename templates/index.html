@@ -367,19 +367,19 @@ const data = await response.json();
 
 let fullText = "";
 
-if(data.snippets){
+if (data.snippets && data.snippets.length > 0) {
 
-fullText += "<h3>Code Snippets</h3>";
+    fullText += "<h3>Code Snippets</h3>";
 
-data.snippets.forEach(snippet=>{
-fullText += "```bash\n" + snippet + "\n```\n\n";
-});
+    data.snippets.forEach(snippet=>{
+        fullText += "```bash\n" + snippet + "\n```\n\n";
+    });
 
+    fullText += "<h3>Explanation</h3>";
 }
 
 if(data.explanation){
 
-fullText += "<h3>Explanation</h3>";
 fullText += data.explanation;
 
 }
