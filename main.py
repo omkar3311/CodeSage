@@ -32,7 +32,7 @@ client = chromadb.Client()
 # collection = client.get_or_create_collection("code_chunks")
 # collection = client.create_collection("code_chunks")
 
-groq = Groq(api_key=os.getenv("API_KEY"))
+groq = Groq(api_key=os.getenv("API_KEY"))   
 
 EXTENSION_MAP = {
     ".py": "python",
@@ -63,6 +63,9 @@ IGNORE_FOLDERS = {
     "dist",
     "build"
 }
+
+def get_collection():
+    return client.get_or_create_collection("code_chunks")
 
 def get_parser_for_file(file_path):
 
@@ -204,6 +207,7 @@ def add_collection(chunks):
             "start_line": chunk["start_line"],
             "end_line": chunk["end_line"]
         })
+    collection = get_collection()
     collection.add(
         ids=ids,
         documents=documents,
@@ -213,7 +217,7 @@ def add_collection(chunks):
 
 def search_code(query, top_k=2, threshold=0.7):
     query_embedding = model.encode(query)
-
+    collection = get_collection()
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=top_k,
@@ -389,7 +393,7 @@ Code Snippets:
 
 def show_all_files():
     uploaded_files_history = []
-
+    collection = get_collection()
     results = collection.get()
 
     files = set()
@@ -406,7 +410,15 @@ def show_all_files():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    global collection
+    global chat_history
 
+    try:
+        client.delete_collection("code_chunks")
+    except:
+        pass
+
+    chat_history = []
     uploaded_files_history = show_all_files()
 
     return templates.TemplateResponse(
@@ -431,6 +443,7 @@ async def upload(request: Request, files: List[UploadFile] = File(...)):
         if not chunks:
             continue
         chunks = embed_chunks(chunks)
+        
         add_collection(chunks)
 
     uploaded_files_history = show_all_files()
@@ -439,13 +452,6 @@ async def upload(request: Request, files: List[UploadFile] = File(...)):
 
 @app.post("/chat")
 async def chat(question: str = Form(...)):
-    global collection
-    global chat_history
-
-    client.delete_collection("code_chunks")
-    collection = client.create_collection("code_chunks")
-
-    chat_history = []
 
     uploaded_files_history = show_all_files()
 
