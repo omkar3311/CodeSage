@@ -5,7 +5,8 @@ CodeSage is an AI-powered codebase assistant that helps you understand, search, 
 Upload your code files and ask questions — CodeSage will search relevant code snippets and generate intelligent explanations.
 
 ---
-
+Link : https://codesage.up.railway.app/
+---
 ## 📸 Preview
 
 ![CodeSage UI](CodeSage.png)

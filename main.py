@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Request, Form
 from fastapi.responses import HTMLResponse , JSONResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from typing import List
 import shutil
 import os
@@ -17,6 +18,7 @@ load_dotenv()
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 model = SentenceTransformer("BAAI/bge-small-en")
 # os.makedirs("chroma_db", exist_ok=True)
