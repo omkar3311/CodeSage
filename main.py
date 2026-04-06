@@ -406,11 +406,10 @@ def show_all_files():
         
     return uploaded_files_history
 
-# chat_history = []
+chat_history = []
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    global collection
     global chat_history
 
     try:
