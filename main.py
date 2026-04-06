@@ -19,15 +19,18 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 model = SentenceTransformer("BAAI/bge-small-en")
-os.makedirs("chroma_db", exist_ok=True)
-client = chromadb.Client(
-    Settings(
-        persist_directory="./chroma_db",
-        anonymized_telemetry=False
-    )
-)
+# os.makedirs("chroma_db", exist_ok=True)
+# client = chromadb.Client(
+#     Settings(
+#         persist_directory="./chroma_db",
+#         anonymized_telemetry=False
+#     )
+# )
 
-collection = client.get_or_create_collection("code_chunks")
+client = chromadb.Client()
+
+# collection = client.get_or_create_collection("code_chunks")
+collection = client.create_collection("code_chunks")
 
 groq = Groq(api_key=os.getenv("API_KEY"))
 
