@@ -30,7 +30,7 @@ model = SentenceTransformer("BAAI/bge-small-en")
 client = chromadb.Client()
 
 # collection = client.get_or_create_collection("code_chunks")
-collection = client.create_collection("code_chunks")
+# collection = client.create_collection("code_chunks")
 
 groq = Groq(api_key=os.getenv("API_KEY"))
 
@@ -402,7 +402,7 @@ def show_all_files():
         
     return uploaded_files_history
 
-chat_history = []
+# chat_history = []
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -439,6 +439,15 @@ async def upload(request: Request, files: List[UploadFile] = File(...)):
 
 @app.post("/chat")
 async def chat(question: str = Form(...)):
+    global collection
+    global chat_history
+
+    client.delete_collection("code_chunks")
+    collection = client.create_collection("code_chunks")
+
+    chat_history = []
+
+    uploaded_files_history = show_all_files()
 
     result = AI(question)
 
@@ -446,8 +455,6 @@ async def chat(question: str = Form(...)):
         "question": question,
         "answer": result
     })
-
-    uploaded_files_history = show_all_files()
 
     return JSONResponse({
         "snippets": result["snippets"],
